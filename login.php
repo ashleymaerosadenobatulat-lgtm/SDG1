@@ -1,49 +1,35 @@
-//login.php
 <?php
 session_start();
-$usersFile = "users.txt";
 
 
+$admin_username = "admin";
+$admin_password = "1234"; 
 
-$users = getUsers($usersFile);
 $message = "";
-$messageType = "";
 
-if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['login'])) {
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $username = trim($_POST["username"]);
+    $password = $_POST["password"];
 
-    $username = trim($_POST['username']);
-    $password = $_POST['password'];
-
-    if (empty($username) || empty($password)) {
-        $message = "Please enter both username and password.";
-        $messageType = "error";
-    }
-    elseif (!isValidPassword($password)) {
-        $message = "Password format is invalid.";
-        $messageType = "error";
-    }
-    elseif (isset($users[$username]) && password_verify($password, $users[$username]['password'])) {
-        $_SESSION['username'] = $username;
-        $_SESSION['name'] = $users[$username]['name'];
-        header("Location: profile.php");
-        exit;
-    }
-    else {
+    if ($username === $admin_username && $password === $admin_password) {
+        $_SESSION["admin"] = $username;
+        header("Location: dashboard.php");
+        exit();
+    } else {
         $message = "Invalid username or password.";
-        $messageType = "error";
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Login</title>
+<title>Admin Login</title>
+<link rel="stylesheet" href="../assets/css/style.css">
 <style>
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f6f8;
+    background-color: #f3f6f4;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -53,40 +39,31 @@ body {
     background-color: #fff;
     padding: 30px;
     border-radius: 10px;
-    width: 350px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 300px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     text-align: center;
 }
-input, button {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
-}
-button {
-    background-color: #007bff;
-    color: white;
-    border: none;
-}
+.login-container img { width: 100px; margin-bottom: 15px; }
+input, button { width: 50%; padding: 10px; margin-bottom: 15px; border-radius: 5px; }
+button { background-color: #e74c3c; color: white; border: none; cursor: pointer; }
+button:hover { opacity: 0.9; }
 .error { color: red; }
 </style>
 </head>
 <body>
-
 <div class="login-container">
-    <h2>Login</h2>
+    <img src="../assets/img/logo.png" alt="Logo">
+    <h2>Admin Login</h2>
 
     <?php if ($message): ?>
-        <p class="<?= $messageType ?>"><?= htmlspecialchars($message) ?></p>
+        <p class="error"><?= htmlspecialchars($message) ?></p>
     <?php endif; ?>
 
     <form method="post">
         <input type="text" name="username" placeholder="Username" required>
         <input type="password" name="password" placeholder="Password" required>
-        <button type="submit" name="login">Login</button>
+        <button type="submit">Login</button>
     </form>
-
-    <p>Don't have an account? <a href="register.php">Register here</a></p>
 </div>
-
 </body>
 </html>
